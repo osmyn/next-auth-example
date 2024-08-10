@@ -10,10 +10,10 @@ export const azureFetchInterceptor =
     options: Parameters<typeof fetch>[1] = {}
   ) => {
     /* Only intercept azure access token request */
-    console.log(`Interceptor URL: ${url} Method: ${options.method}`);
-    // if (url.toString().includes("openid-configuration")) {
-    //   return originalFetch(url, options);
-    // }
+    console.warn(`Interceptor URL: ${url} Method: ${options.method}`);
+    if (url.toString().includes("openid-configuration")) {
+      return originalFetch(url, options);
+    }
 
     // if (
     //   url === "https://api.azure.com/oauth/access_token" &&
