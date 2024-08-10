@@ -49,14 +49,14 @@ const storage = createStorage({
 const config = {
   theme: { logo: "https://authjs.dev/img/logo-sm.png" },
   adapter: UnstorageAdapter(storage),
-  //trustHost: true,
+  trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
     // Apple,
     // Auth0,
     AzureB2C({
       clientId: process.env.AUTH_AZURE_AD_B2C_ID,
-      clientSecret: process.env.HIDDEN_AUTH_AZURE_AD_B2C_SECRET_HIDDEN,
+      clientSecret: process.env.AUTH_AZURE_AD_B2C_SECRET,
       authorization: process.env.AUTH_AZURE_AD_B2C_AUTHORIZATION,
       token: process.env.AUTH_AZURE_AD_B2C_TOKEN,
       issuer: process.env.AUTH_AZURE_AD_B2C_ISSUER,
