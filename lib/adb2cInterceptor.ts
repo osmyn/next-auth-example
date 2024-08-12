@@ -10,50 +10,62 @@ export const azureFetchInterceptor =
     options: Parameters<typeof fetch>[1] = {}
   ) => {
     /* Only intercept azure access token request */
-    console.warn(`Interceptor URL: ${url} Method: ${options.method}`);
-    if (url.toString().includes("openid-configuration")) {
-      return originalFetch(url, options);
+    console.log(
+      `Interceptor URL: ${url} Method: ${options.method}, body: ${options?.body}`
+    );
+
+    if (url.toString().includes(".well-known/openid-configuration")) {
+      const response = await originalFetch(url, options);
+      /* Clone the response to be able to modify it */
+      const clonedResponse = response.clone();
+      const body = await clonedResponse.json();
+
+      // Fix Issuer format
+      const azureIssuer = body.issuer;
+      const correctIssuer = process.env.AUTH_AZURE_AD_B2C_ISSUER;
+      console.log(
+        `Updating Azure Issuer: ${azureIssuer} to correct issuer: ${correctIssuer}`
+      );
+      body.issuer = correctIssuer;
+
+      // Fix userinfo_endpoint format
+      if (!body.userinfo_endpoint) {
+        console.log("Adding userinfo_endpoint to openid-configuration");
+        body.userinfo_endpoint = process.env.AUTH_AZURE_AD_B2C_USER_INFO;
+      }
+
+      /*  Create a new response with the modified body */
+      const modifiedResponse = new Response(JSON.stringify(body), {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
+
+      /* Add the original url to the response */
+      return Object.defineProperty(modifiedResponse, "url", {
+        value: response.url,
+      });
     }
 
-    // if (
-    //   url === "https://api.azure.com/oauth/access_token" &&
-    //   options.method === "POST"
-    // ) {
-    //   const response = await originalFetch(url, options);
-    //   /* Clone the response to be able to modify it */
-    //   const clonedResponse = response.clone();
-    //   const body = await clonedResponse.json();
+    if (url.toString().includes("/token") && options.method === "POST") {
+      const response = await originalFetch(url, options);
+      /* Clone the response to be able to modify it */
+      const clonedResponse = response.clone();
+      const body = await clonedResponse.json();
+      console.log("Azure token response", body);
 
-    //   /* Get the long-lived access token */
-    //   const longLivedAccessTokenResponse = await originalFetch(
-    //     `https://graph.azure.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.AUTH_AZURE_SECRET}&access_token=${body.access_token}`
-    //   );
-    //   const longLivedAccessTokenResponseBody =
-    //     await longLivedAccessTokenResponse.json();
+      /*  Create a new response with the modified body */
+      const modifiedResponse = new Response(JSON.stringify(body), {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
 
-    //   body.access_token = longLivedAccessTokenResponseBody.access_token;
-    //   body.token_type = "bearer";
-    //   body.expires_in = longLivedAccessTokenResponseBody.expires_in;
-
-    //   // Calculate the `expires_at` Unix timestamp by adding `expires_in` to the current timestamp
-    //   const currentTimestampInSeconds = Math.floor(Date.now() / 1000); // Current Unix timestamp in seconds
-    //   body.expires_at =
-    //     currentTimestampInSeconds + longLivedAccessTokenResponseBody.expires_in;
-
-    //   body.scope = "user_profile user_media";
-
-    //   /*  Create a new response with the modified body */
-    //   const modifiedResponse = new Response(JSON.stringify(body), {
-    //     status: response.status,
-    //     statusText: response.statusText,
-    //     headers: response.headers,
-    //   });
-
-    //   /* Add the original url to the response */
-    //   return Object.defineProperty(modifiedResponse, "url", {
-    //     value: response.url,
-    //   });
-    // }
+      /* Add the original url to the response */
+      return Object.defineProperty(modifiedResponse, "url", {
+        value: response.url,
+      });
+    }
 
     return originalFetch(url, options);
   };

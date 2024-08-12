@@ -54,13 +54,50 @@ const config = {
   providers: [
     // Apple,
     // Auth0,
+    // AzureB2C,
     AzureB2C({
       clientId: process.env.AUTH_AZURE_AD_B2C_ID,
       clientSecret: process.env.AUTH_AZURE_AD_B2C_SECRET,
       authorization: process.env.AUTH_AZURE_AD_B2C_AUTHORIZATION,
+      primaryUserFlow: process.env.AZURE_AD_B2C_PRIMARY_USER_FLOW,
       token: process.env.AUTH_AZURE_AD_B2C_TOKEN,
       issuer: process.env.AUTH_AZURE_AD_B2C_ISSUER,
+      // authorization: {
+      //   params: {
+      //     scope: "openid profile email",
+      //     response_type: "code id_token token",
+      //   },
+      // },
     }),
+    // AzureB2C({
+    //   tenantId: process.env.AZURE_AD_B2C_TENANT_NAME,
+    //   clientId: process.env.AZURE_AD_B2C_CLIENT_ID,
+    //   clientSecret: process.env.AZURE_AD_B2C_CLIENT_SECRET,
+    //   primaryUserFlow: process.env.AZURE_AD_B2C_PRIMARY_USER_FLOW,
+    //   //authorization: { params: { scope: "offline_access openid" } },
+    //   authorization: {
+    //     params: {
+    //       scope: `https://${process.env.AZURE_AD_B2C_TENANT_NAME}.onmicrosoft.com/api/ff.read https://${process.env.AZURE_AD_B2C_TENANT_NAME}.onmicrosoft.com/api/ff.write offline_access openid`,
+    //     },
+    //   },
+    // }),
+    // AzureB2C({
+    //   clientId: process.env.AUTH_AZURE_AD_B2C_ID,
+    //   clientSecret: process.env.AUTH_AZURE_AD_B2C_SECRET,
+    //   tenantId: "common",
+    //   token: {
+    //     url: `https://login.microsoftonline.com/common/oauth2/v2.0/token`,
+    //   },
+    //   userinfo: {
+    //     url: "https://graph.microsoft.com/oidc/userinfo",
+    //   },
+    //   authorization: {
+    //     url: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize`,
+    //     params: {
+    //       scope: "openid profile email User.Read",
+    //     },
+    //   },
+    // }),
     // AzureB2C({
     //   clientId: process.env.AUTH_AZURE_AD_B2C_ID,
     //   clientSecret: process.env.AUTH_AZURE_AD_B2C_SECRET,
