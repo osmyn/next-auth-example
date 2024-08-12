@@ -34,7 +34,6 @@ import memoryDriver from "unstorage/drivers/memory";
 import vercelKVDriver from "unstorage/drivers/vercel-kv";
 import { UnstorageAdapter } from "@auth/unstorage-adapter";
 import type { NextAuthConfig } from "next-auth";
-import azureAdB2c from "next-auth/providers/azure-ad-b2c";
 
 const storage = createStorage({
   driver: process.env.VERCEL

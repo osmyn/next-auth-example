@@ -9,10 +9,13 @@ export const azureFetchInterceptor =
     url: Parameters<typeof fetch>[0],
     options: Parameters<typeof fetch>[1] = {}
   ) => {
+    const logit = process.env.NODE_ENV !== "production";
     /* Only intercept azure access token request */
-    console.log(
-      `Interceptor URL: ${url} Method: ${options.method}, body: ${options?.body}`
-    );
+    if (logit) {
+      console.log(
+        `Interceptor URL: ${url} Method: ${options.method}, body: ${options?.body}`
+      );
+    }
 
     if (url.toString().includes(".well-known/openid-configuration")) {
       const response = await originalFetch(url, options);
@@ -20,17 +23,11 @@ export const azureFetchInterceptor =
       const clonedResponse = response.clone();
       const body = await clonedResponse.json();
 
-      // Fix Issuer format
-      const azureIssuer = body.issuer;
-      const correctIssuer = process.env.AUTH_AZURE_AD_B2C_ISSUER;
-      console.log(
-        `Updating Azure Issuer: ${azureIssuer} to correct issuer: ${correctIssuer}`
-      );
-      body.issuer = correctIssuer;
-
       // Fix userinfo_endpoint format
       if (!body.userinfo_endpoint) {
-        console.log("Adding userinfo_endpoint to openid-configuration");
+        if (logit) {
+          console.log("Adding userinfo_endpoint to openid-configuration");
+        }
         body.userinfo_endpoint = process.env.AUTH_AZURE_AD_B2C_USER_INFO;
       }
 
@@ -52,11 +49,15 @@ export const azureFetchInterceptor =
       /* Clone the response to be able to modify it */
       const clonedResponse = response.clone();
       const body = await clonedResponse.json();
-      console.log("Azure token response", body);
+      if (logit) {
+        console.log("Azure token response", body);
+      }
 
       // Adding access_token to userinfo response
       if (!body.access_token) {
-        console.log("No access_token found in response");
+        if (logit) {
+          console.log("No access_token found in response");
+        }
         body.access_token = "dummy";
       }
 
