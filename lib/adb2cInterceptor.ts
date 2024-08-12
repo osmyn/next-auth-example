@@ -54,6 +54,12 @@ export const azureFetchInterceptor =
       const body = await clonedResponse.json();
       console.log("Azure token response", body);
 
+      // Adding access_token to userinfo response
+      if (!body.access_token) {
+        console.log("No access_token found in response");
+        body.access_token = "dummy";
+      }
+
       /*  Create a new response with the modified body */
       const modifiedResponse = new Response(JSON.stringify(body), {
         status: response.status,

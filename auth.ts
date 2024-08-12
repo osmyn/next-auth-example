@@ -63,6 +63,7 @@ const config = {
       token: process.env.AUTH_AZURE_AD_B2C_TOKEN,
       issuer: process.env.AUTH_AZURE_AD_B2C_ISSUER,
       // authorization: {
+      //   url: process.env.AUTH_AZURE_AD_B2C_AUTHORIZATION,
       //   params: {
       //     scope: "openid profile email",
       //     response_type: "code id_token token",
